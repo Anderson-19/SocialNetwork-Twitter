@@ -1,9 +1,9 @@
 import { User } from "../interfaces";
 import { DataBase } from "./dataBase";
 
-export class UserDB extends DataBase{
+export class UserDB extends DataBase {
 
-    constructor(){
+    constructor() {
         super();
     }
 
@@ -12,7 +12,7 @@ export class UserDB extends DataBase{
 
         if (email) {
             query = 'SELECT * FROM users WHERE email=$1';
-            
+
             return await this.pool.query(query, [email]);
         } else {
             query = 'SELECT * FROM users WHERE user_id=$1';
@@ -45,4 +45,30 @@ export class UserDB extends DataBase{
         const query = 'SELECT * FROM users';
         return (await this.pool.query(query)).rows;
     }
+
+    public async follow(followId: string, followerId: string, followingId: string): Promise<any> {
+        const query = 'INSERT INTO follows (follow_id,date,follower_id,following_id) VALUES ($1,NOW(),$2,$3)';
+        return await this.pool.query(query, [followId, followerId, followingId]);
+    }
+
+    public async getfollowers(followingId: string): Promise<any> {
+        const query = 'SELECT follower_id FROM follows WHERE following_id=$1';
+        return await this.pool.query(query, [followingId]);
+    }
+
+    public async getfollowings(followerId: string): Promise<any> {
+        const query = 'SELECT following_id FROM follows WHERE follower_id=$1';
+        return await this.pool.query(query, [followerId]);
+    }
+
+    public async unFollow(followingId: string, userId: string): Promise<any> {
+        const query = 'DELETE FROM follows WHERE following_id=$1 AND follower_id=$2';
+        return await this.pool.query(query, [followingId, userId]);
+    }
 }
+
+/*Estás son las personas que me siguien*/
+/* SELECT follower_id FROM follows WHERE following_id='7cade9c4-39bd-4c0d-b2dd-d531a7a8c1b1' */
+
+/*Estás son las personas que yo sigó*/
+/* SELECT following_id FROM follows WHERE follower_id='7cade9c4-39bd-4c0d-b2dd-d531a7a8c1b1' */

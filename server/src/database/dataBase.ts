@@ -12,7 +12,7 @@ export class DataBase {
         this.pool = new Pool({
             user: 'postgres',
             host: 'localhost',
-            database: 'social-network',
+            database: 'twitterDB',
             password: '29758990',
             port: 5432,
         });
