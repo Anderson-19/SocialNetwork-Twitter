@@ -81,10 +81,10 @@ export class User {
     }
 
     public unFollowUser = async (req: Request, res: Response) => {
-        const { followingId, userId } = req.params;
+        const { followingId, Id } = req.params;
 
         try {
-            await this.database.unFollow(followingId, userId);
+            await this.database.unFollow(followingId, Id);
             res.status(200).json({ ok: true });
         } catch (error) {
             console.log(error);
