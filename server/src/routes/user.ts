@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { check } from 'express-validator';
 
-import { validateField, ValidateJWT } from '../middlewares';
+import { MiddlewaresValidators } from '../middlewares/validators';
 import { DBValidators } from '../helpers';
 import { User } from '../controllers/index';
 
@@ -11,19 +11,20 @@ export class UserRoutes {
 
         const router = Router();
         const UserController = new User();
-        const validateJWT = new ValidateJWT();
+        const middlewaresValidators = new MiddlewaresValidators();
         const validators = new DBValidators();
 
         router.get('/get/:userId',[
-            validateJWT.validateJWT,
+            middlewaresValidators.validateJWT,
             check('userId', 'Invalid ID').isUUID(),
-            check('userId').custom( validators.existsUserID )
+            check('userId').custom( validators.existsUserID ),
+            middlewaresValidators.validateField
         ], UserController.getUser);
 
         router.get('/getAll', UserController.getUsers);
 
         router.put('/edit/:userId', [
-            validateJWT.validateJWT,
+            middlewaresValidators.validateJWT,
             check('name', 'Name is required').not().isEmpty(),
             check('lastname', 'Lastname is required').not().isEmpty(),
             check('location', 'Location is required').not().isEmpty(),
@@ -31,27 +32,30 @@ export class UserRoutes {
             check('biography', 'Biography is required').not().isEmpty(),
             check('userId', 'Invalid ID').isUUID(),
             check('userId').custom( validators.existsUserID ),
-            validateField
+            middlewaresValidators.validateField
         ], UserController.editUser);
 
         router.put('/follow/:followingId',[
-            validateJWT.validateJWT,
+            middlewaresValidators.validateJWT,
             check('followingId', 'Invalid ID').isUUID(),
-            check('followingId').custom( validators.existsUserID )
+            check('followingId').custom( validators.existsUserID ),
+            middlewaresValidators.validateField
         ], UserController.followUser);
 
         router.get('/getFollow/:userId',[
-            validateJWT.validateJWT,
+            middlewaresValidators.validateJWT,
             check('userId', 'Invalid ID').isUUID(),
-            check('userId').custom( validators.existsUserID )
+            check('userId').custom( validators.existsUserID ),
+            middlewaresValidators.validateField
         ], UserController.getFollowerAndFollowings);
 
         router.delete('/unFollow/:userId/:followingId', [
-            validateJWT.validateJWT,
+            middlewaresValidators.validateJWT,
             check('userId', 'Invalid ID').isUUID(),
             check('userId').custom( validators.existsUserID ),
             check('followingId', 'Invalid ID').isUUID(),
-            check('followingId').custom( validators.existsUserID )
+            check('followingId').custom( validators.existsUserID ),
+            middlewaresValidators.validateField
         ], UserController.unFollowUser);
 
         return router;

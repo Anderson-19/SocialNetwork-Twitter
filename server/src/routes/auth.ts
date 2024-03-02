@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { check } from 'express-validator';
 
-import { validateField } from '../middlewares';
+import { MiddlewaresValidators } from '../middlewares/validators';
 import { Auth } from '../controllers';
 
 export class AuthRoutes {
@@ -10,11 +10,12 @@ export class AuthRoutes {
 
     const router = Router();
     const AuthController = new Auth();
+    const middlewaresValidators = new MiddlewaresValidators();
 
     router.post('/logIn', [
       check('email', 'Email is required').isEmail(),
       check('password', 'Password is required').not().isEmpty(),
-      validateField
+      middlewaresValidators.validateField
     ], AuthController.logIn);
 
     router.post('/singIn', [
@@ -23,7 +24,7 @@ export class AuthRoutes {
       check('username', 'Username is required').not().isEmpty(),
       check('email', 'Email is required').isEmail(),
       check('password', 'Password is required').not().isEmpty(),
-      validateField
+      middlewaresValidators.validateField
     ], AuthController.singIn);
 
     router.post('/logout', AuthController.logout);
