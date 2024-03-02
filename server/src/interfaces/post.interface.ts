@@ -1,4 +1,4 @@
-export interface Post {
+export interface PostInterface {
     post_id?: string;
     content?: string | string[];
     img?: string;
