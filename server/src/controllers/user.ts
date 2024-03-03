@@ -3,16 +3,16 @@ import { type UploadedFile } from 'express-fileupload';
 
 import { UserDB } from "../database";
 import { AuthJWT } from '../helpers/generate-jwt';
-import { UuidAdapter } from '../helpers';
+import { UuidAdapter, UploadFile } from '../helpers';
 
 export class User {
 
     private database: UserDB;
-    //private uploadFile: UploadFile;
+    private uploadFile: UploadFile;
 
     constructor() {
         this.database = new UserDB();
-        //this.uploadFile = new UploadFile();
+        this.uploadFile = new UploadFile();
     }
 
 
@@ -71,7 +71,7 @@ export class User {
         const followId = UuidAdapter.v4();
 
         try {
-            if( followerId === followingId ) return res.status(404).json({ ok: false, msg: "You can't follow yourself" });
+            if (followerId === followingId) return res.status(404).json({ ok: false, msg: "You can't follow yourself" });
             await this.database.follow(followId, followerId, followingId);
             res.status(200).json({ ok: true });
         } catch (error) {
@@ -105,6 +105,52 @@ export class User {
             res.status(400).json({ error });
         }
 
+    }
+
+    public changeAvatarUser = async (req: Request, res: Response) => {
+        const { userId, imgUrl } = req.params;
+        const { tempFilePath } = req.files?.file as UploadedFile;
+
+        try {
+            const getData = await this.database.getDataUser("", userId);
+            const avatar = getData.rows[0]?.avatar.split('/')[9];
+            if (avatar === imgUrl) {
+                await this.uploadFile.destroyFile(imgUrl.split('.')[0], 'users');
+                const file = await this.uploadFile.uploadFile(tempFilePath, 'users');
+                await this.database.setAvatarBannerUser(userId, file, '');
+                res.status(201).json({ ok: true, avatar: file });
+            } else {
+                const file = await this.uploadFile.uploadFile(tempFilePath, 'users');
+                await this.database.setAvatarBannerUser(userId, file, '');
+                res.status(201).json({ ok: true, avatar: file });
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(401).json({ ok: false });
+        }
+    }
+
+    public changeBannerUser = async (req: Request, res: Response) => {
+        const { userId, imgUrl } = req.params;
+        const { tempFilePath } = req.files?.file as UploadedFile;
+
+        try {
+            const getData = await this.database.getDataUser("", userId);
+            const banner = getData.rows[0]?.banner.split('/')[9];
+            if (banner === imgUrl) {
+                await this.uploadFile.destroyFile(imgUrl.split('.')[0], 'users');
+                const file = await this.uploadFile.uploadFile(tempFilePath, 'users');
+                await this.database.setAvatarBannerUser(userId, '', file);
+                res.status(201).json({ ok: true, banner: file });
+            } else {
+                const file = await this.uploadFile.uploadFile(tempFilePath, 'users');
+                await this.database.setAvatarBannerUser(userId, '', file);
+                res.status(201).json({ ok: true, banner: file });
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(401).json({ ok: false });
+        }
     }
 
 }

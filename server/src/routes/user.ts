@@ -58,6 +58,24 @@ export class UserRoutes {
             middlewaresValidators.validateField
         ], UserController.unFollowUser);
 
+        router.post('/changeAvatar/:userId/:imgUrl', [
+            middlewaresValidators.validateJWT,
+            check('userId', 'Invalid ID').isUUID(),
+            check('userId').custom( validators.existsUserID ),
+            check('imgUrl').not().isEmpty(),
+            middlewaresValidators.validateFile,
+            middlewaresValidators.validateField
+        ], UserController.changeAvatarUser);
+
+        router.put('/changeBanner/:userId/:imgUrl', [
+            middlewaresValidators.validateJWT,
+            check('userId', 'Invalid ID').isUUID(),
+            check('userId').custom( validators.existsUserID ),
+            check('imgUrl').not().isEmpty(),
+            middlewaresValidators.validateFile,
+            middlewaresValidators.validateField
+        ], UserController.changeBannerUser);
+
         return router;
     }
 
