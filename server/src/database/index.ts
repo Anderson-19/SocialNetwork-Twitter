@@ -1,4 +1,6 @@
+export * from './dataBase';
+
 export * from './user';
 export * from './post';
-export * from './interactions';
-export * from './dataBase';
+export * from './post-likes';
+export * from './post-forwarded';

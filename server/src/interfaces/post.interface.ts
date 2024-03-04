@@ -5,4 +5,5 @@ export interface PostInterface {
     created_at?: string;
     user_id?: string;
     likes?: number;
+    forwarded?: number;
 }
