@@ -6,4 +6,5 @@ export interface PostInterface {
     user_id?: string;
     likes?: number;
     forwarded?: number;
+    comments?: number;
 }
