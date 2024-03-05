@@ -5,6 +5,7 @@ import { UserRoutes } from './user';
 import { PostRoutes } from './post';
 import { PostLikesRoutes } from './post-likes';
 import { PostForwardedRoutes } from './post-forwarded';
+import { PostCommentRoutes } from './post-comments';
 
 export class AppRoutes {
 
@@ -17,6 +18,7 @@ export class AppRoutes {
     router.use('/api/post',  PostRoutes.routes);
     router.use('/api/post/like',  PostLikesRoutes.routes);
     router.use('/api/post/forwarded',  PostForwardedRoutes.routes);
+    router.use('/api/post/comment',  PostCommentRoutes.routes);
 
     return router;
   }

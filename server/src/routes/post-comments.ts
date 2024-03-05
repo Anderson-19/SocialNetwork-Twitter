@@ -1,48 +1,42 @@
 import { Router } from "express";
 import { check } from "express-validator";
 
-import { Post } from "../controllers";
+import { PostComment } from "../controllers";
 import { MiddlewaresValidators } from "../middlewares/validators";
 import { DBValidators } from "../helpers";
 
-export class PostRoutes {
+export class PostCommentRoutes {
+
     static get routes() {
 
         const router = Router();
-        const postController = new Post();
+        const postCommentController = new PostComment();
         const middlewaresValidators = new MiddlewaresValidators();
         const validators = new DBValidators();
     
-        router.post('/create', [
+        router.post('/create/:postId', [
             middlewaresValidators.validateJWT,
+            check('postId', 'Invalid ID').isUUID(),
+            check('postId').custom( validators.existsPostID ),
             check('content', 'Está vacío o es invalido').not().isEmpty(),
             middlewaresValidators.validateField
-        ], postController.createPost);
+        ], postCommentController.createComment);
 
-        router.get('/getAll', middlewaresValidators.validateJWT, postController.getPosts);
+        router.get('/getAll', middlewaresValidators.validateJWT, postCommentController.getComments);
 
-        router.get('/getPostsByUserId/:userId', [
-            middlewaresValidators.validateJWT,
-            check('userId', 'Invalid ID').isUUID(),
-            check('userId').custom( validators.existsUserID ),
-            middlewaresValidators.validateField
-        ], postController.getPostsById);
-
-        router.get('/getPostByPostId/:postId', [
+        router.get('/getCommentsOfPost/:postId', [
             middlewaresValidators.validateJWT,
             check('postId', 'Invalid ID').isUUID(),
             check('postId').custom( validators.existsPostID ),
             middlewaresValidators.validateField
-        ], postController.getPostById);
-
-        router.get('/getPostsOfFollowings', middlewaresValidators.validateJWT, postController.getPostsOfFollowingsById);
+        ], postCommentController.getCommentsByPostId);
 
         router.delete('/delete/:postId', [
             middlewaresValidators.validateJWT,
             check('postId', 'Invalid ID').isUUID(),
             check('postId').custom( validators.existsPostID ),
             middlewaresValidators.validateField
-        ], postController.deletePost);
+        ], postCommentController.deleteComment);
 
         return router;
       }
