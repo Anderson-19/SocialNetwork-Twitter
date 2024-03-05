@@ -4,24 +4,13 @@ import { PostInterface } from '../interfaces';
 
 export class PostDB extends DataBase {
 
-    constructor(){
+    constructor() {
         super();
     }
 
     public async setPost({ content, img, post_id, user_id }: PostInterface) {
-        let query = '';
-
-        if (img && content) {
-            query = 'INSERT INTO posts (post_id,content,img,created_at,user_id) VALUES ($1,$2,$3,NOW(),$4)';
-            return await this.pool.query(query, [post_id, content, img, user_id]);
-        } else if (content) {
-            query = 'INSERT INTO posts (post_id,content,created_at,user_id) VALUES ($1,$2,NOW(),$3)';
-            return await this.pool.query(query, [post_id, content, user_id]);
-        } else {
-            query = 'INSERT INTO posts (post_id,img,created_at,user_id) VALUES ($1,$2,NOW(),$3)';
-            return await this.pool.query(query, [post_id, img, user_id]);
-        }
-
+        const query = 'INSERT INTO posts (post_id,content,img,created_at,user_id) VALUES ($1,$2,$3,NOW(),$4)';
+        return await this.pool.query(query, [post_id, content, img, user_id]);
     }
 
     public async getPosts(): Promise<any[]> {
@@ -54,6 +43,16 @@ export class PostDB extends DataBase {
 
     public async deletePost(postId: string): Promise<any> {
         const query = 'DELETE FROM posts WHERE post_id=$1';
+        return await this.pool.query(query, [postId]);
+    }
+
+    public async getCommentsPostId(postId: string): Promise<any> {
+        const query = 'SELECT post_comment_id FROM post_comments AS pc INNER JOIN posts AS p ON p.post_id=pc.post_comment_id WHERE pc.post_id=$1';
+        return await this.pool.query(query, [postId]);
+    }
+
+    public async deleteComments(postId: string): Promise<any> {
+        const query = 'DELETE FROM post_comments WHERE post_comment_id=$1';
         return await this.pool.query(query, [postId]);
     }
 
