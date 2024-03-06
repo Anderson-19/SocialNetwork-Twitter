@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { logIn } from '../../api'
-import { LoadingIcon } from '../../shared/LoadingIcon'
+import { LoadingIcon } from '../../shared'
 import { useUserStore } from '../../store'
 
 type FormInputs = {

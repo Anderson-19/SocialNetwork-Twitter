@@ -1,9 +1,9 @@
 import clsx from 'clsx'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { register as registerUser } from '../../api';
-import { LoadingIcon } from '../../shared/LoadingIcon';
+import { LoadingIcon } from '../../shared';
 
 type FormInputs = {
     name: string
