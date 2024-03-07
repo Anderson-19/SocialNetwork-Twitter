@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 import { useUserStore } from './store';
-import { TopMenu, Sidebar } from './shared';
+import { TopMenu, Sidebar, UsersForFollow } from './shared';
 
 export const App: FC = () => {
 
@@ -24,7 +24,7 @@ export const App: FC = () => {
 
           <Outlet />
           <div className="h-full w-screen border-r pt-8 px-5">
-            {/* <UsersForFollow /> */}
+            <UsersForFollow />
           </div>
 
         </div>
