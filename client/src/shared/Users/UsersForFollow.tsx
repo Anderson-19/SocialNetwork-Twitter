@@ -1,28 +1,30 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { User } from '../../interfaces/user';
-import { getFollowingsById, getUsers, setFollowing, unFollow } from '../../services/actions';
-import { useStore } from '../../hooks/useStore';
+import { User } from '../../interfaces';
+//import { getFollowingsById, getUsers, setFollowing, unFollow } from '../../services/actions';
+
+import { getUsers } from '../../api';
+import { useUserStore } from '../../store';
 
 export const UsersForFollow = () => {
 
-  const [dataUsers, setDataUsers] = useState<User[]>();
+  const [users, setUsers] = useState<User[]>();
   const [dataFollowings, setDataFollowings] = useState<any[]>();
   const nav = useNavigate();
-  const { user } = useStore();
+  const user = useUserStore(state => state.user);
 
   useEffect(() => {
     getUsers()
-      .then((res: any) => setDataUsers(res.users))
+      .then((res: any) => setUsers(res.users))
       .catch(console.log)
-  }, [dataUsers]);
+  }, [users]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     getFollowingsById(user.token, user.uid!)
       .then(res => setDataFollowings(res.dataFollowings))
       .catch(console.log)
-  }, [dataFollowings])
+  }, [dataFollowings]) */
 
   return (
     <div className="max-w-sm rounded-lg m-4 bg-slate-50">
@@ -36,11 +38,11 @@ export const UsersForFollow = () => {
 
       {/* <!--first person who to follow--> */}
       {
-        dataUsers && dataUsers?.map(dataUser => (
+        users && users?.map(dataUser => (
           <>
-            <div className={`${dataUser.user_id === user.uid ? 'hidden' : 'flex flex-shrink-0 hover:bg-slate-200 cursor-pointer'}`}>
+            <div className={`${dataUser.uid === user.uid ? 'hidden' : 'flex flex-shrink-0 hover:bg-slate-200 cursor-pointer'}`}>
               <div className="flex-1 ">
-                <div className="flex items-center w-48" onClick={() => nav(`/profile`, { state: { user_id: dataUser.user_id } })}>
+                <div className="flex items-center w-48" onClick={() => nav(`/profile`, { state: { user_id: dataUser.uid } })}>
                   <div>
                     <img className="inline-block h-10 w-auto rounded-full ml-4 mt-2" src={dataUser.avatar} alt="" />
                   </div>
@@ -57,7 +59,11 @@ export const UsersForFollow = () => {
               </div>
 
               <div className="px-4 py-2 m-2 text-lg font-medium text-slate-700 hover:text-blue-500 flex justify-center">
-                {
+                <button
+                  className="bg-blue-600 font-semibold py-2 px-4 text-white rounded-full hover:bg-blue-500 border border-white hover:border-transparent">
+                  Follow
+                </button>
+                {/* {
                   (dataFollowings && dataUsers)
                     && dataFollowings?.find(f => f.following_id === dataUser?.user_id) ? (
                     <button
@@ -72,7 +78,7 @@ export const UsersForFollow = () => {
                       Follow
                     </button>
                   )
-                }
+                } */}
               </div>
             </div>
           </>
