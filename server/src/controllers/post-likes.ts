@@ -64,7 +64,7 @@ export class PostLikes {
         
         try {
             const likes = await this.postDB.getPostById(postId);
-            const disLike = Number( likes.rows[0].likes ) - 1;
+            const disLike = Number( likes.rows[0].likes ) === 0 ? 0 : Number( likes.rows[0].likes ) - 1;
             await this.postLikesDB.updateLikeOfPost({ likes: disLike, post_id: postId });
             await this.postLikesDB.disLike(postId);
             res.status(200).json({ ok: true });
