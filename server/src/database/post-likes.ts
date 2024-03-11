@@ -14,7 +14,7 @@ export class PostLikesDB extends DataBase {
 
     public async getLikesByUserId(userId: string): Promise<any> {
         const query = `
-            SELECT post_like_id, date, likes, post_forwarded, user_like_id, pl.post_id, content, img, u.user_id, name, lastname, username, email, avatar FROM post_likes AS pl 
+            SELECT post_like_id, date, likes, forwarded, user_like_id, pl.post_id, content, img, u.user_id, pl.user_id AS pl_id, name, lastname, username, email, avatar FROM post_likes AS pl 
             INNER JOIN posts AS p ON p.post_id=pl.post_id 
             INNER JOIN users AS u ON u.user_id=pl.user_like_id 
             WHERE pl.user_id=$1
@@ -23,7 +23,11 @@ export class PostLikesDB extends DataBase {
     }
 
     public async getLikesByPostId(postId: string): Promise<any> {
-        const query = "SELECT * FROM post_likes AS pl INNER JOIN posts AS p ON p.post_id=pl.post_id WHERE p.post_id=$1";
+        const query = `
+            SELECT pl.post_like_id, pl.date, pl.user_id AS pl_uid, pl.user_like_id, p.post_id, p.content, p.img, p.created_at, p.user_id, p.likes, p.forwarded, p.comments FROM post_likes AS pl 
+            INNER JOIN posts AS p ON p.post_id=pl.post_id
+            WHERE p.post_id=$1
+        `;
         return (await this.pool.query(query, [postId])).rows;
     }
 
