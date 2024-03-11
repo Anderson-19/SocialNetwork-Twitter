@@ -24,7 +24,11 @@ export class PostForwardedDB extends DataBase {
     }
 
     public async getForwardedByPostId(postId: string): Promise<any> {
-        const query = "SELECT * FROM post_forwarded AS pf INNER JOIN posts AS p ON p.post_id=pf.post_id WHERE p.post_id=$1";
+        const query = `
+            SELECT pf.forwarded_id, pf.date, pf.user_id AS pf_uid, pf.user_forwarded_id, p.post_id, p.content, p.img, p.created_at, p.user_id, p.likes, p.forwarded, p.comments FROM post_forwarded AS pf 
+            INNER JOIN posts AS p ON p.post_id=pf.post_id 
+            WHERE p.post_id=$1
+        `;
         return (await this.pool.query(query, [postId])).rows;
     }
 
