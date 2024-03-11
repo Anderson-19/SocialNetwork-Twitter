@@ -21,6 +21,11 @@ export class UserDB extends DataBase {
 
     }
 
+    public async getUser(name?: string): Promise<any> {
+        const query = 'SELECT * FROM users WHERE name=$1';
+        return await this.pool.query(query, [name]);
+    }
+
     public async setDataUser({ uid, name, lastname, username, email, password, avatar, banner }: User): Promise<any> {
         const query = 'INSERT INTO users (user_id,name,lastname,username,email,password,avatar,created_at,banner) VALUES ($1,$2,$3,$4,$5,$6,$7,NOW(),$8)';
         return await this.pool.query(query, [uid, name, lastname, username, email, password, avatar, banner]);
@@ -66,9 +71,3 @@ export class UserDB extends DataBase {
         return await this.pool.query(query, [followingId, userId]);
     }
 }
-
-/*Estás son las personas que me siguien*/
-/* SELECT follower_id FROM follows WHERE following_id='7cade9c4-39bd-4c0d-b2dd-d531a7a8c1b1' */
-
-/*Estás son las personas que yo sigó*/
-/* SELECT following_id FROM follows WHERE follower_id='7cade9c4-39bd-4c0d-b2dd-d531a7a8c1b1' */
