@@ -1,11 +1,12 @@
 import { FC } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
-import { useUserStore } from './store';
-import { TopMenu, Sidebar, UsersForFollow } from './shared';
+import { useUIStore, useUserStore } from './store';
+import { TopMenu, Sidebar, UsersForFollow, Modal } from './shared';
 
 export const App: FC = () => {
 
   const user = useUserStore(state => state.user);
+  const { typePost } = useUIStore( state => state );
 
   if (!user.isLogged) {
     return <Navigate to="/" />;
@@ -23,6 +24,7 @@ export const App: FC = () => {
           <Sidebar />
 
           <Outlet />
+          <Modal typePost={ typePost } />
           <div className="h-full w-screen border-r pt-8 px-5">
             <UsersForFollow />
           </div>
