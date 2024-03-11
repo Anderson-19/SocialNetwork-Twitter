@@ -1,15 +1,31 @@
 import { create } from 'zustand';
 
 interface State {
-  isSideMenuOpen: boolean;
+  isSideModalPost: boolean;
 
-  openSideMenu: () => void;
-  closeSideMenu: () => void;
+  openModalPost: () => void;
+  closeModalPost: () => void;
+
+  isSideModalEditUser: boolean;
+
+  openModalEditUser: () => void;
+  closeModalEditUser: () => void;
+
+  typePost: string;
+  setTypePost: (typePost: string) => void;
 }
 
 export const useUIStore = create<State>()((set) => ({
-  isSideMenuOpen: false,
 
-  openSideMenu: () => set({ isSideMenuOpen: true }),
-  closeSideMenu: () => set({ isSideMenuOpen: false }),
+  isSideModalPost: false,
+  openModalPost: () => set({ isSideModalPost: true }),
+  closeModalPost: () => set({ isSideModalPost: false }),
+
+  isSideModalEditUser: false,
+  openModalEditUser: () => set({ isSideModalEditUser: true }),
+  closeModalEditUser: () => set({ isSideModalEditUser: false }),
+
+  typePost: "",
+  setTypePost: ( type: string ) => set({typePost: type })
+
 }));
