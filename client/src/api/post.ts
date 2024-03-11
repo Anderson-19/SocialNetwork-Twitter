@@ -38,3 +38,13 @@ export const getPostsByUserId = async ( token: string = '', userId: string ): Pr
     return data;
 }
 
+export const getPostById = async ( token: string = '', postId: string ): Promise<any> => {      
+    const { data } = await api.get<any>(`/post/getPostByPostId/${ postId }`, {
+        headers: {
+            'x_token': token
+        }
+    });
+    return data;
+}
+
+
