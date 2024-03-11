@@ -25,11 +25,6 @@ export class UserRoutes {
 
         router.put('/edit/:userId', [
             middlewaresValidators.validateJWT,
-            check('name', 'Name is required').not().isEmpty(),
-            check('lastname', 'Lastname is required').not().isEmpty(),
-            check('location', 'Location is required').not().isEmpty(),
-            check('birthdate', 'Birthdate is required').not().isEmpty(),
-            check('biography', 'Biography is required').not().isEmpty(),
             check('userId', 'Invalid ID').isUUID(),
             check('userId').custom( validators.existsUserID ),
             middlewaresValidators.validateField
@@ -67,7 +62,7 @@ export class UserRoutes {
             middlewaresValidators.validateField
         ], UserController.changeAvatarUser);
 
-        router.put('/changeBanner/:userId/:imgUrl', [
+        router.post('/changeBanner/:userId/:imgUrl', [
             middlewaresValidators.validateJWT,
             check('userId', 'Invalid ID').isUUID(),
             check('userId').custom( validators.existsUserID ),
