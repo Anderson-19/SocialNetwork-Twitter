@@ -7,13 +7,14 @@ import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlin
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'; */
 
-import { 
-    IoHomeOutline, 
-    IoNotificationsOutline, 
-    IoSendOutline, 
-    IoBookmarkOutline, 
-    IoPersonOutline, 
-    IoHeartDislikeOutline } from 'react-icons/io5';
+import {
+    IoHomeOutline,
+    IoNotificationsOutline,
+    IoSendOutline,
+    IoBookmarkOutline,
+    IoPersonOutline,
+    IoHeartOutline
+} from 'react-icons/io5';
 
 import { useUIStore, useUserStore } from '../../store';
 
@@ -22,8 +23,8 @@ export const Sidebar = () => {
     const [profile, setProfile] = useState<boolean>(false);
     const nav = useNavigate();
     const location = useLocation();
-    const openSideMenu = useUIStore( state => state.openSideMenu );
-    const user = useUserStore( state => state.user );
+    const { openModalPost, setTypePost } = useUIStore(state => state);
+    const user = useUserStore(state => state.user);
 
     const selectPage = (page: string): string => {
         if (location.pathname === `/${page}`) return 'text-blue-500';
@@ -33,44 +34,48 @@ export const Sidebar = () => {
 
     return (
         <div className="h-full pt-10 px-5">
-            <div className={`mt-4 py-1.5 text-lg font-medium ${selectPage('home')} hover:text-blue-500 group cursor-pointer flex justify-start`} onClick={() => {setProfile(false); nav('/home');}}>
-                <IoHomeOutline />
+            <div className={`mt-4 py-1.5 text-lg font-medium ${selectPage('home')} hover:text-blue-500 group cursor-pointer flex justify-start`} onClick={() => { setProfile(false); nav('/home'); }}>
+                <IoHomeOutline size={25} />
                 <p className="ml-3">Home</p>
             </div>
 
-            <div className={`mt-4 py-1.5 text-lg font-medium ${selectPage('notifications')} hover:text-blue-500 group cursor-pointer flex justify-start`} onClick={() => {setProfile(false); nav('/notifications');}}>
-                <IoNotificationsOutline />
+            <div className={`mt-4 py-1.5 text-lg font-medium ${selectPage('notifications')} hover:text-blue-500 group cursor-pointer flex justify-start`} onClick={() => { setProfile(false); nav('/notifications'); }}>
+                <IoNotificationsOutline size={25} />
                 <p className="ml-3">Notifications</p>
             </div>
 
-            <div className={`mt-4 py-1.5 text-lg font-medium ${selectPage('messages')} hover:text-blue-500 group cursor-pointer flex justify-start`} onClick={() => {setProfile(false); nav('/messages');}}>
-                <IoSendOutline />
+            <div className={`mt-4 py-1.5 text-lg font-medium ${selectPage('messages')} hover:text-blue-500 group cursor-pointer flex justify-start`} onClick={() => { setProfile(false); nav('/messages'); }}>
+                <IoSendOutline size={25} />
                 <p className="ml-3">Messages</p>
             </div>
 
-            <div className={`mt-4 py-1.5 text-lg font-medium ${selectPage('bookmarks')} hover:text-blue-500 group cursor-pointer flex justify-start`} onClick={() => {setProfile(false); nav('/bookmarks');}}>
-                <IoBookmarkOutline />
+            <div className={`mt-4 py-1.5 text-lg font-medium ${selectPage('bookmarks')} hover:text-blue-500 group cursor-pointer flex justify-start`} onClick={() => { setProfile(false); nav('/bookmarks'); }}>
+                <IoBookmarkOutline size={25} />
                 <p className="ml-3">Bookmarks</p>
             </div>
 
-            <div className={`mt-4 py-1.5 text-lg font-medium ${selectPage('likes')} hover:text-blue-500 group cursor-pointer flex justify-start`} onClick={() => {setProfile(false); nav('/likes');}}>
-                <IoHeartDislikeOutline />
+            <div className={`mt-4 py-1.5 text-lg font-medium ${selectPage('likes')} hover:text-blue-500 group cursor-pointer flex justify-start`} onClick={() => { setProfile(false); nav('/likes'); }}>
+                <IoHeartOutline size={25} />
                 <p className="ml-3">Likes</p>
             </div>
 
             <div
-                className={`${ profile ? 'mt-4 py-1.5 text-lg font-medium text-blue-500 hover:text-blue-500 group cursor-pointer flex justify-start' : 'mt-4 py-1.5 text-lg font-medium text-slate-700 hover:text-blue-500 group cursor-pointer flex justify-start' }`}
+                className={`${profile ? 'mt-4 py-1.5 text-lg font-medium text-blue-500 hover:text-blue-500 group cursor-pointer flex justify-start' : 'mt-4 py-1.5 text-lg font-medium text-slate-700 hover:text-blue-500 group cursor-pointer flex justify-start'}`}
                 onClick={() => {
                     setProfile(true);
                     nav(`/profile`, { state: { user_id: user.uid } });
                 }}
             >
-                <IoPersonOutline />
+                <IoPersonOutline size={25} />
                 <p className="ml-3">Profile</p>
             </div>
 
             <div className="mt-4 py-1.5 text-lg font-medium text-slate-700 hover:text-blue-500 flex justify-center">
-                <button onClick={openSideMenu} className="bg-blue-600 px-3 md:px-16 py-1 md:py-2 font-semibold text-white rounded-full hover:bg-blue-500 border border-white hover:border-transparent">Post</button>
+                <button
+                    onClick={() => { setTypePost("post"); openModalPost(); }}
+                    className="bg-blue-600 px-3 md:px-16 py-1 md:py-2 font-semibold text-white rounded-full hover:bg-blue-500 border border-white hover:border-transparent">
+                    Post
+                </button>
             </div>
 
             <div

@@ -4,13 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { User } from '../../interfaces';
 //import { getFollowingsById, getUsers, setFollowing, unFollow } from '../../services/actions';
 
-import { getUsers } from '../../api';
+import { getFollowersAndFollowing, getUsers } from '../../api';
 import { useUserStore } from '../../store';
 
 export const UsersForFollow = () => {
 
-  const [users, setUsers] = useState<User[]>();
-  const [dataFollowings, setDataFollowings] = useState<any[]>();
+  const [users, setUsers] = useState<any[]>();
+  const [follow, setFollow] = useState<any>();
+
   const nav = useNavigate();
   const user = useUserStore(state => state.user);
 
@@ -18,13 +19,17 @@ export const UsersForFollow = () => {
     getUsers()
       .then((res: any) => setUsers(res.users))
       .catch(console.log)
-  }, [users]);
+  }, []);
 
-  /* useEffect(() => {
-    getFollowingsById(user.token, user.uid!)
-      .then(res => setDataFollowings(res.dataFollowings))
+  useEffect(() => {
+    getFollowersAndFollowing(user.token, user.uid)
+      .then(res => setFollow(res))
       .catch(console.log)
-  }, [dataFollowings]) */
+  }, []);
+
+  console.log(users);
+  console.log(follow);
+
 
   return (
     <div className="max-w-sm rounded-lg m-4 bg-slate-50">
@@ -40,9 +45,9 @@ export const UsersForFollow = () => {
       {
         users && users?.map(dataUser => (
           <>
-            <div className={`${dataUser.uid === user.uid ? 'hidden' : 'flex flex-shrink-0 hover:bg-slate-200 cursor-pointer'}`}>
+            <div className={`${dataUser.user_id === user.uid ? 'hidden' : 'flex flex-shrink-0 hover:bg-slate-200 cursor-pointer'}`}>
               <div className="flex-1 ">
-                <div className="flex items-center w-48" onClick={() => nav(`/profile`, { state: { user_id: dataUser.uid } })}>
+                <div className="flex items-center w-48" onClick={() => nav(`/profile`, { state: { user_id: dataUser.user_id } })}>
                   <div>
                     <img className="inline-block h-10 w-auto rounded-full ml-4 mt-2" src={dataUser.avatar} alt="" />
                   </div>
@@ -59,26 +64,26 @@ export const UsersForFollow = () => {
               </div>
 
               <div className="px-4 py-2 m-2 text-lg font-medium text-slate-700 hover:text-blue-500 flex justify-center">
-                <button
-                  className="bg-blue-600 font-semibold py-2 px-4 text-white rounded-full hover:bg-blue-500 border border-white hover:border-transparent">
-                  Follow
-                </button>
-                {/* {
-                  (dataFollowings && dataUsers)
-                    && dataFollowings?.find(f => f.following_id === dataUser?.user_id) ? (
+
+                {
+                  (follow?.followings && dataUser)
+                    && follow?.followings?.find((f: any) => f.following_id === dataUser.user_id) ? (
+
                     <button
-                      onClick={async () => await unFollow(dataUser?.user_id!, user.uid!, user.token!)}
-                      className="bg-blue-600 font-semibold py-2 px-4 text-white rounded-full hover:bg-blue-500 border border-white hover:border-transparent">
+                      className="max-h-max whitespace-nowrap focus:outline-none focus:ring max-w-max border bg-transparent border-blue-500 text-blue-500 hover:border-blue-800 flex items-center hover:shadow-lg font-bold py-2 px-4 rounded-full mr-0 ml-auto"
+                    /* onClick={async () => await unFollow(state?.user_id, user.uid!, user.token!)}  */
+                    >
                       Following
                     </button>
-                  ) : (
+                  ) : dataUser.user_id !== user.uid && (
                     <button
-                      onClick={async () => await setFollowing(dataUser?.user_id!, user.uid!, user.token!)}
-                      className="bg-blue-600 font-semibold py-2 px-4 text-white rounded-full hover:bg-blue-500 border border-white hover:border-transparent">
+                      className="bg-blue-600 font-semibold py-2 px-4 text-white rounded-full hover:bg-blue-500 border border-white hover:border-transparent"
+                    /* onClick={async () => await setFollowing(state?.user_id, user.uid!, user.token!)}  */
+                    >
                       Follow
                     </button>
                   )
-                } */}
+                }
               </div>
             </div>
           </>
