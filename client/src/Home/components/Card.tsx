@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 /* import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import LoopOutlinedIcon from '@mui/icons-material/LoopOutlined';
@@ -14,23 +14,68 @@ import {
 } from 'react-icons/io5'
 
 import { dayAndMonth } from "../../helpers";
-import { useUserStore } from '../../store';
+import { useUIStore, useUserStore } from '../../store';
+import { addForwarded, addLike, deleteForwarded, disLike, getForwardedByPostId, getLikesByPostId } from '../../api';
 
 //import { addLike, deletePost, disLike } from '../../services/actions';
 
 interface Props {
     post: any;
-    likes?: any[];
-    dataFollowings?: any[];
+}
+
+interface Interactions {
+    likes: boolean;
+    forwarded: boolean;
+    quantityLikes: number;
+    quantityForwarded: number;
 }
 
 export const Card = ({ post }: Props) => {
 
     const [showDrowDown, setShowDrowDown] = useState(false);
-    const user = useUserStore(state => state.user);
+    const [changeOfInteraction, setChangeOfInteraction] = useState<Interactions>({
+        likes: false,
+        forwarded: false,
+        quantityLikes: 0,
+        quantityForwarded: 0
+    });
+    const [forwardedByPost, setForwardedByPost] = useState<any[]>();
+    const [likesByPost, setLikesByPost] = useState<any[]>();
     const nav = useNavigate();
+    const user = useUserStore(state => state.user);
+    const { setTypePost, openModalPost } = useUIStore(state => state);
 
-    const interactions = (interaction: any) => post[interaction] ?? 0; 
+    useEffect(() => {
+        getLikesByPostId(user.token, post.post_id)
+            .then(res => setLikesByPost(res.likes))
+            .catch(console.log)
+    }, []);
+
+    useEffect(() => {
+        getForwardedByPostId(user.token, post.post_id)
+            .then(res => setForwardedByPost(res.forwarded))
+            .catch(console.log)
+    }, []);
+
+    const interaction = (type: string) => {
+
+        if (type === "likes") {
+            setChangeOfInteraction({
+                ...changeOfInteraction,
+                likes: !changeOfInteraction.likes,
+                quantityLikes: Number(post["likes"]) + changeOfInteraction.quantityLikes
+            });
+        } else if (type === "forwarded") {
+            setChangeOfInteraction({
+                ...changeOfInteraction,
+                forwarded: !changeOfInteraction.forwarded,
+                quantityForwarded: Number(post["forwarded"]) + changeOfInteraction.quantityForwarded
+            });
+        }
+    }
+
+    const isLike = likesByPost?.find(like => like.pl_uid === user.uid);
+    const isForwarded = forwardedByPost?.find(forwarded => forwarded.pf_uid === user.uid);
 
     return (
         <ul className="list-none">
@@ -46,7 +91,7 @@ export const Card = ({ post }: Props) => {
                                     <p className="text-base leading-6 font-medium text-black">
                                         {post.name} {post.lastname}
                                         <span className="text-sm leading-5 font-medium text-gray-400 group-hover:text-gray-300 transition ease-in-out duration-150 ml-2">
-                                            @{post.username} . { dayAndMonth(post.created_at) }
+                                            @{post.username} . {dayAndMonth(post.created_at)}
                                         </span>
                                     </p>
                                 </div>
@@ -70,30 +115,85 @@ export const Card = ({ post }: Props) => {
                         }
 
                         <div className="flex items-center py-4 px-6 mb-2">
-                            <div className="flex-1 flex items-center text-xs text-gray-400 hover:text-blue-400 transition duration-350 ease-in-out cursor-pointer">
-                                {/* <CommentOutlinedIcon titleAccess='Replay' /> */}
-                                <IoChatbubbleOutline className="mr-2" size={25}/>
-                                { interactions( "comments" ) }
+                            <div
+                                onClick={() => {
+                                    setTypePost("comment");
+                                    openModalPost();
+                                }}
+                                className="flex-1 flex items-center text-xs text-gray-400 hover:text-blue-400 transition duration-350 ease-in-out cursor-pointer">
+                                <IoChatbubbleOutline className="mr-2" size={25} />
+                                {post["comments"] ?? 0}
                             </div>
                             <div className="flex-1 flex items-center text-xs text-gray-400 hover:text-green-400 transition duration-350 ease-in-out cursor-pointer">
-                                {/* <LoopOutlinedIcon titleAccess='Repost' /> */}
-                                <IoSync className="mr-2" size={25}/>
-                                { interactions( "forwarded" ) }
+
+                                {changeOfInteraction.forwarded || isForwarded
+                                    ? (
+                                        <>
+                                            <IoSync
+                                                className="mr-2 text-green-400"
+                                                size={25}
+                                                onClick={() => {
+                                                    interaction("forwarded");
+                                                    deleteForwarded(user.token, post.post_id);
+                                                }}
+                                            />
+                                            {(changeOfInteraction.quantityForwarded + 1) || ''}
+                                        </>
+                                    )
+                                    : (
+                                        <>
+                                            <IoSync
+                                                className="mr-2"
+                                                size={25}
+                                                onClick={() => {
+                                                    interaction("forwarded");
+                                                    addForwarded(user.token, post.post_id, post.user_id);
+                                                }}
+                                            />
+                                            {(changeOfInteraction.quantityForwarded - 1) < 0 ? '' : (changeOfInteraction.quantityForwarded - 1) || ''}
+                                        </>
+                                    )
+                                }
+
                             </div>
                             <div className="flex-1 flex items-center text-xs text-gray-400 hover:text-red-600 transition duration-350 ease-in-out cursor-pointer">
-                                {/* {
-                                    likeId 
-                                        ? <FavoriteBorderOutlinedIcon style={{ color: '#FF0000' }} titleAccess='Like' onClick={() => disLike(post.post_id, user.token!)}/>
-                                        : <FavoriteBorderOutlinedIcon titleAccess='Like' onClick={() => addLike(post.post_id, user.uid!, user.token!) }/>
-                                } */}
-                                <IoHeartOutline className="mr-2" size={25}/>
 
-                                { interactions( "likes" ) }
+                                {changeOfInteraction.likes || isLike
+                                    ? (
+                                        <>
+                                            <IoHeartOutline
+                                                className="mr-2 text-red-600"
+                                                title='dislike'
+                                                size={25}
+                                                onClick={() => {
+                                                    interaction("likes");
+                                                    disLike(user.token, post.post_id);
+                                                }}
+                                            />
+                                            {(changeOfInteraction.quantityLikes + 1) || ''}
+
+                                        </>
+                                    )
+                                    : (
+                                        <>
+                                            <IoHeartOutline
+                                                className="mr-2"
+                                                title='like'
+                                                size={25}
+                                                onClick={() => {
+                                                    interaction("likes");
+                                                    addLike(user.token, post.post_id, post.user_id);
+                                                }}
+                                            />
+                                            {(changeOfInteraction.quantityLikes - 1) < 0 ? '' : (changeOfInteraction.quantityLikes - 1) || ''}
+                                        </>
+                                    )
+                                }
+
                             </div>
                             <div className="flex-1 flex items-center text-xs text-gray-400 hover:text-blue-400 transition duration-350 ease-in-out cursor-pointer">
                                 <a onClick={() => setShowDrowDown(!showDrowDown)}>
-                                    {/* <MoreVertOutlinedIcon titleAccess='More' /> */}
-                                    <IoEllipsisVerticalSharp className="mr-2" size={25}/>
+                                    <IoEllipsisVerticalSharp className="mr-2" size={25} />
 
                                     <div className={` ${showDrowDown ? 'flex items-center justify-center bg-gray-100' : 'hidden'}`}>
                                         <div className="relative inline-block text-left">
@@ -102,8 +202,7 @@ export const Card = ({ post }: Props) => {
 
                                                 <div className={`${post.user_id === user.uid ? 'cursor-pointer' : 'hidden'}`} /* onClick={async () => await deletePost(user.token, post.post_id)} */>
                                                     <a className="block px-4 py-2 text-sm text-red-500 hover:bg-red-100 rounded-md">
-                                                        {/* <DeleteForeverOutlinedIcon /> */}
-                                                        <IoRemoveOutline size={25}/>  Delete
+                                                        <IoRemoveOutline size={25} />  Delete
                                                     </a>
                                                 </div>
                                             </div>
