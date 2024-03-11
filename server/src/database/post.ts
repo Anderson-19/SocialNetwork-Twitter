@@ -28,7 +28,7 @@ export class PostDB extends DataBase {
 
     public async getPostsOfFollowingsById(userId: string): Promise<any[]> {
         const query = `
-            SELECT DISTINCT name, lastname, username, email, avatar, u.created_at, u.user_id, content, img, post_id, p.created_at, following_id FROM follows AS f
+            SELECT DISTINCT name, lastname, username, email, avatar, u.created_at, u.user_id, content, img, post_id, p.likes, p.forwarded, p.comments, p.created_at, following_id FROM follows AS f
             INNER JOIN posts AS p ON p.user_id=f.following_id 
             INNER JOIN users AS u ON u.user_id=f.following_id
             WHERE f.following_id<>$1 AND p.user_id<>$2
