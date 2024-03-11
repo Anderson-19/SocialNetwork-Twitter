@@ -12,7 +12,7 @@ export class Auth {
         this.database = new UserDB();
     }
 
-    public singIn = async (req: Request, res: Response) => {
+    public register = async (req: Request, res: Response) => {
         const {
             email,
             password,
@@ -28,7 +28,7 @@ export class Auth {
             if (getDataUser.rowCount > 0) {
                 return res.status(400).json({
                     ok: false,
-                    msg: `El usuario ${email} ya existe`
+                    message: `El usuario ${email} ya existe`
                 });
             }
 
@@ -40,10 +40,11 @@ export class Auth {
                 name,
                 email
             })
+
         } catch (error) {
             res.status(500).json({
                 ok: false,
-                msg: 'Por favor hable con el administrador',
+                message: 'Por favor hable con el administrador',
             });
         }
     }
@@ -58,7 +59,7 @@ export class Auth {
             if (getDataUser.rowCount < 1) {
                 return res.status(400).json({
                     ok: false,
-                    msg: `El usuario ${email} no existe`
+                    message: `El usuario ${email} no existe`
                 });
             }
 
@@ -67,15 +68,13 @@ export class Auth {
             if (!validPassword) {
                 return res.status(400).json({
                     ok: false,
-                    msg: 'Password incorrecto'
+                    message: 'Password incorrecto'
                 });
             }
 
-            const token = await AuthJWT.generateJWT({ uid: getDataUser.rows[0]?.user_id }, '3h');
+            const token = await AuthJWT.generateJWT({ uid: getDataUser.rows[0]?.user_id }, '4h');
 
-            //await this.database.setRemoveConnectionUser( { uid: getDataUser.rows[0]?.user_id, statusConnetion: true} )
-
-            res.json({
+            res.status(200).json({
                 ok: true,
                 uid: getDataUser.rows[0]?.user_id,
                 name: getDataUser.rows[0]?.name,
@@ -84,32 +83,32 @@ export class Auth {
                 email: getDataUser.rows[0]?.email,
                 created_at: getDataUser.rows[0]?.created_at,
                 avatar: getDataUser.rows[0]?.avatar,
+                banner: getDataUser.rows[0]?.banner,
                 token
             })
 
         } catch (error) {
+            console.log(error);
             res.status(500).json({
                 ok: false,
-                msg: 'Por favor hable con el administrador'
+                message: 'Hable con el administrador'
             });
         }
 
     }
 
     public logout = async (req: Request, res: Response) => {
-        const { uid } = req.body;
 
         try {
-            //await this.database?.setRemoveConnectionUser( { uid, statusConnetion: false} );
             res.json({
                 ok: true,
-                msg: 'Sesión cerrada'
+                message: 'Sesión cerrada'
             });
         } catch (error) {
-            console.log(error)
+            console.log(error);
             res.json({
                 ok: false,
-                msg: 'Problema al cerrar la sesión'
+                message: 'Problema al cerrar la sesión'
             })
         }
     }
