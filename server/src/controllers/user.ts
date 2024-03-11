@@ -109,7 +109,7 @@ export class User {
 
     public changeAvatarUser = async (req: Request, res: Response) => {
         const { userId, imgUrl } = req.params;
-        const { tempFilePath } = req.files?.file as UploadedFile;
+        const { tempFilePath } = req.files?.avatar as UploadedFile;
 
         try {
             const getData = await this.database.getDataUser("", userId);
@@ -132,7 +132,7 @@ export class User {
 
     public changeBannerUser = async (req: Request, res: Response) => {
         const { userId, imgUrl } = req.params;
-        const { tempFilePath } = req.files?.file as UploadedFile;
+        const { tempFilePath } = req.files?.banner as UploadedFile;
 
         try {
             const getData = await this.database.getDataUser("", userId);
