@@ -64,7 +64,7 @@ export class PostForwarded {
         
         try {
             const forwareded = await this.postDB.getPostById(postId);
-            const deleteForwareded = Number( forwareded.rows[0].forwareded ) - 1;
+            const deleteForwareded = Number( forwareded.rows[0].forwareded ) === 0 ? 0 : Number( forwareded.rows[0].forwareded ) - 1;
 
             await this.postForwardedDB.deleteForwarded(postId);
             await this.postForwardedDB.updateForwardedOfPost({ forwarded: deleteForwareded, post_id: postId });
