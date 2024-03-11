@@ -9,6 +9,7 @@ interface State {
     lastname?: string;
     username?: string;
     avatar?: string;
+    banner?: string;
     password?: string;
     token?: string;
     created_at?: string;
@@ -29,6 +30,7 @@ export const useUserStore = create<State>()(
         lastname: "",
         username: "",
         avatar: "",
+        banner: "",
         password: "",
         token: "",
         created_at: "",
